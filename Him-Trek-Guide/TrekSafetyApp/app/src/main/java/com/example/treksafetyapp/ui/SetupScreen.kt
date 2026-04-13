@@ -7,6 +7,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -79,7 +81,7 @@ fun SetupScreen(viewModel: TrekViewModel, onNavigateToTracking: () -> Unit) {
             modifier = Modifier.fillMaxWidth()
         )
         Text(
-            text = "Enter the phone number of someone who should be alerted if you don't check in.",
+            text = "Enter the phone number of someone who should be alerted if you don't check in.\nWe only use SMS to alert your emergency contact if you don't check in.",
             color = Color.LightGray,
             fontSize = 12.sp,
             modifier = Modifier.fillMaxWidth().padding(top = 4.dp, start = 4.dp)
@@ -108,16 +110,42 @@ fun SetupScreen(viewModel: TrekViewModel, onNavigateToTracking: () -> Unit) {
 
         Spacer(modifier = Modifier.weight(1f))
 
+    val showPermissionDialog = remember { mutableStateOf(false) }
+
         Button(
             onClick = {
-                viewModel.startTrek()
-                android.widget.Toast.makeText(context, "Tracking started. You'll be alerted before time expires.", android.widget.Toast.LENGTH_LONG).show()
-                onNavigateToTracking()
+                showPermissionDialog.value = true
             },
             modifier = Modifier.fillMaxWidth().height(56.dp),
             colors = ButtonDefaults.buttonColors(containerColor = safetyGreen)
         ) {
             Text("Start Trek", color = darkBlue, fontWeight = FontWeight.Bold, fontSize = 18.sp)
         }
+    }
+
+    if (showPermissionDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showPermissionDialog.value = false },
+            title = { Text("TrekShield needs permission to send SMS", fontWeight = FontWeight.Bold) },
+            text = { Text("Why?\nIf you don't check in on time, the app will automatically send your live location to your emergency contact.\n\nThis could help someone find you quickly in an emergency.\n\nWe never send messages without this safety trigger.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showPermissionDialog.value = false
+                    viewModel.startTrek()
+                    android.widget.Toast.makeText(context, "Tracking started. You'll be alerted before time expires.", android.widget.Toast.LENGTH_LONG).show()
+                    onNavigateToTracking()
+                }) {
+                    Text("Allow & Continue", color = safetyGreen, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPermissionDialog.value = false }) {
+                    Text("Cancel", color = Color.Gray)
+                }
+            },
+            containerColor = darkBlue,
+            titleContentColor = Color.White,
+            textContentColor = Color.LightGray
+        )
     }
 }
