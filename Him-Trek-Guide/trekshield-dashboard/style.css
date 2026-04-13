@@ -1,0 +1,52 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #0B3C5D;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background: rgba(11, 60, 93, 0.9);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  z-index: 1000;
+}
+
+h2 {
+  margin: 0;
+  color: #2ECC71;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+#status-indicator {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 30px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.3s ease;
+}
+
+#map {
+  flex-grow: 1;
+  width: 100%;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #0B3C5D;
+  color: white;
+  border: 1px solid #2ECC71;
+}
+
+.leaflet-popup-tip {
+  background: #2ECC71;
+}

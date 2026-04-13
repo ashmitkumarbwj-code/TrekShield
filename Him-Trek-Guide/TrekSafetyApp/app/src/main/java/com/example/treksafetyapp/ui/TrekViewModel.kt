@@ -51,7 +51,7 @@ class TrekViewModel(application: Application) : AndroidViewModel(application) {
         if (existingUserId == null) {
             viewModelScope.launch(Dispatchers.IO) {
                 try {
-                    val url = java.net.URL("http://192.168.43.131:5000/api/users/register")
+                    val url = java.net.URL("https://trekshield-backend.vercel.app/api/users/register")
                     val conn = url.openConnection() as HttpURLConnection
                     conn.requestMethod = "POST"
                     conn.setRequestProperty("Content-Type", "application/json; utf-8")

@@ -62,7 +62,7 @@ class TrekTrackingService : Service() {
 
                     // Connect to Backend inside background thread
                     try {
-                        val url = java.net.URL("http://192.168.43.131:5000/api/location/save")
+                        val url = java.net.URL("https://trekshield-backend.vercel.app/api/location/save")
                         val conn = url.openConnection() as java.net.HttpURLConnection
                         conn.requestMethod = "POST"
                         conn.setRequestProperty("Content-Type", "application/json; utf-8")
