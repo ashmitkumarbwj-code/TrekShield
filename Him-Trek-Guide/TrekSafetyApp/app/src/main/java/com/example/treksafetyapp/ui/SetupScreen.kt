@@ -16,6 +16,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
+import android.widget.Toast
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -114,7 +118,15 @@ fun SetupScreen(viewModel: TrekViewModel, onNavigateToTracking: () -> Unit) {
 
         Button(
             onClick = {
-                showPermissionDialog.value = true
+                val permissionStatus = ContextCompat.checkSelfPermission(context, Manifest.permission.SEND_SMS)
+                if (permissionStatus == PackageManager.PERMISSION_GRANTED) {
+                    // Skip dialog and start trek immediately
+                    viewModel.startTrek()
+                    Toast.makeText(context, "Tracking started. You'll be alerted before time expires.", Toast.LENGTH_LONG).show()
+                    onNavigateToTracking()
+                } else {
+                    showPermissionDialog.value = true
+                }
             },
             modifier = Modifier.fillMaxWidth().height(56.dp),
             colors = ButtonDefaults.buttonColors(containerColor = safetyGreen)
@@ -126,16 +138,17 @@ fun SetupScreen(viewModel: TrekViewModel, onNavigateToTracking: () -> Unit) {
     if (showPermissionDialog.value) {
         AlertDialog(
             onDismissRequest = { showPermissionDialog.value = false },
-            title = { Text("TrekShield needs permission to send SMS", fontWeight = FontWeight.Bold) },
-            text = { Text("Why?\nIf you don't check in on time, the app will automatically send your live location to your emergency contact.\n\nThis could help someone find you quickly in an emergency.\n\nWe never send messages without this safety trigger.") },
+            title = { Text("Why TrekShield needs SMS permission", fontWeight = FontWeight.Bold) },
+            text = { Text("If you don’t check in on time, TrekShield will automatically send your live location to your emergency contact using SMS.\n\nThis helps them find you quickly in an emergency — even without internet.\n\nWe DO NOT read your personal messages or send anything without this safety trigger.") },
             confirmButton = {
                 TextButton(onClick = {
                     showPermissionDialog.value = false
+                    Toast.makeText(context, "Permission required for emergency SMS alerts", Toast.LENGTH_SHORT).show()
                     viewModel.startTrek()
-                    android.widget.Toast.makeText(context, "Tracking started. You'll be alerted before time expires.", android.widget.Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "Tracking started. You'll be alerted before time expires.", Toast.LENGTH_LONG).show()
                     onNavigateToTracking()
                 }) {
-                    Text("Allow & Continue", color = safetyGreen, fontWeight = FontWeight.Bold)
+                    Text("Continue", color = safetyGreen, fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {

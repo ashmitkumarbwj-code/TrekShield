@@ -4,30 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy Policy - TrekShield</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+        h1 { color: #0B3C5D; border-bottom: 2px solid #2ECC71; padding-bottom: 10px; }
+        h2 { color: #0B3C5D; margin-top: 30px; }
+        ul { padding-left: 20px; }
+        .contact { background: #f4f4f4; padding: 20px; border-radius: 8px; margin-top: 40px; }
+    </style>
 </head>
-<body style="background: #0B3C5D; color: white; padding: 40px; line-height: 1.6; max-width: 800px; margin: auto; font-family: 'Inter', sans-serif;">
-    <div class="glass-container" style="padding: 40px; text-align: left;">
-        <h1 style="color: #2ECC71; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px;">TrekShield Privacy Policy</h1>
-        <p style="color: #E0E0E0;"><strong>Effective Date:</strong> April 13, 2026</p>
-        
-        <h2 style="margin-top: 30px;">1. SMS Permissions (SEND_SMS)</h2>
-        <p>The core functionality of TrekShield relies on Android's SMS capabilities. This permission is utilized <strong>exclusively</strong> as a "dead-man switch" safety mechanism. It automatically dispatches your last known GPS coordinates to your self-designated emergency contact only if you fail to cancel the timer before your trek expires.</p>
-        <p>TrekShield <strong>does not</strong> read your personal SMS inbox, nor does it monitor incoming messages.</p>
-        
-        <h2 style="margin-top: 30px;">2. Data Collection and Usage</h2>
-        <p>TrekShield is designed as an offline-first safety utility. We do not sell, rent, or distribute your data to third parties. We collect your Name and chosen Emergency Contact strictly for use in the automated dispatch text.</p>
-        
-        <h2 style="margin-top: 30px;">3. Location Tracking</h2>
-        <p>Location data (GPS) is securely captured locally on your device and synced with our backend infrastructure solely to provide accurate emergency tracking logs for your trusted contacts. Your location is never requested when the app timer is inactive.</p>
-        
-        <h2 style="margin-top: 30px;">4. Contact</h2>
-        <p>If you have questions about this security policy or data operations, please contact the developer directly at <strong>ashmitkumarbwj@gmail.com</strong>.</p>
-        
-        <div style="margin-top: 40px;">
-            <a href="index.html" style="color: #2ECC71; text-decoration: none; font-weight: bold; padding: 10px 20px; border: 1px solid #2ECC71; border-radius: 5px;">← Back to Home</a>
-        </div>
+<body>
+    <h1>TrekShield Privacy Policy</h1>
+    <p>Last Updated: April 13, 2026</p>
+
+    <p>TrekShield is a safety app designed to help users during treks, especially in low or no network conditions.</p>
+
+    <h2>Information We Collect</h2>
+    <ul>
+        <li><strong>Name:</strong> Provided by you during setup to identify you in emergency messages.</li>
+        <li><strong>Phone Number:</strong> Your emergency contact's number to send alerts.</li>
+        <li><strong>Location Data:</strong> Captured only during an active trek tracking session.</li>
+    </ul>
+
+    <h2>How We Use Information</h2>
+    <p>TrekShield uses this information solely to:</p>
+    <ul>
+        <li>Track the user's location during an active trek.</li>
+        <li>Send automated emergency SMS alerts to your selected contact if you fail to check in.</li>
+    </ul>
+
+    <h2>SMS Permission Usage</h2>
+    <p>
+        TrekShield uses <strong>SEND_SMS</strong> permission strictly to send emergency alerts to a user-selected contact.
+        The app <strong>DOES NOT</strong> read, store, or access your personal messages or inbox.
+    </p>
+
+    <h2>Data Sharing</h2>
+    <p>We do not sell, trade, or share your personal data with third parties.</p>
+
+    <h2>Data Storage</h2>
+    <p>Location data is temporarily stored on secure servers to support the live tracking dashboard for your trusted contacts.</p>
+
+    <h2>User Control</h2>
+    <p>Users can stop tracking anytime by using the "I am Safe" feature in the app, which immediately cancels any scheduled emergency alerts.</p>
+
+    <div class="contact">
+        <h2>Contact</h2>
+        <p>For any questions or data requests, please contact the developer at:</p>
+        <p><strong>ashmitkumarbwj@gmail.com</strong></p>
     </div>
 </body>
 </html>
