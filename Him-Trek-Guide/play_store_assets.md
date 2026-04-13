@@ -54,4 +54,5 @@ Internet-based messaging is unreliable in remote trekking areas. SMS ensures del
 ## 🌐 Privacy Policy URL
 Once you push to GitHub and enable GitHub Pages, your URL will be:
 **https://ashmitkumarbwj-code.github.io/TrekShield/trekshield-website/privacy.html**
-*(Note: Verify this after enabling Pages in GitHub Settings)*
+
+*Note: Verify this after enabling Pages in GitHub Settings (Branch: main, Folder: /root).*

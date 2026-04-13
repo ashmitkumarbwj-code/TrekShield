@@ -20,6 +20,8 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,6 +30,18 @@ fun SetupScreen(viewModel: TrekViewModel, onNavigateToTracking: () -> Unit) {
     val contact by viewModel.contact.collectAsState()
     val duration by viewModel.durationHours.collectAsState()
     val context = androidx.compose.ui.platform.LocalContext.current
+    
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            viewModel.startTrek()
+            Toast.makeText(context, "Tracking started. You'll be alerted before time expires.", Toast.LENGTH_LONG).show()
+            onNavigateToTracking()
+        } else {
+            Toast.makeText(context, "SMS permission is required for emergency alerts to work", Toast.LENGTH_LONG).show()
+        }
+    }
 
     val darkBlue = Color(0xFF0B3C5D)
     val safetyGreen = Color(0xFF2ECC71)
@@ -144,9 +158,7 @@ fun SetupScreen(viewModel: TrekViewModel, onNavigateToTracking: () -> Unit) {
                 TextButton(onClick = {
                     showPermissionDialog.value = false
                     Toast.makeText(context, "Permission required for emergency SMS alerts", Toast.LENGTH_SHORT).show()
-                    viewModel.startTrek()
-                    Toast.makeText(context, "Tracking started. You'll be alerted before time expires.", Toast.LENGTH_LONG).show()
-                    onNavigateToTracking()
+                    permissionLauncher.launch(Manifest.permission.SEND_SMS)
                 }) {
                     Text("Continue", color = safetyGreen, fontWeight = FontWeight.Bold)
                 }
