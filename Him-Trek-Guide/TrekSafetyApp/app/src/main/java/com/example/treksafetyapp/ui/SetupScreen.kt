@@ -20,7 +20,8 @@ import androidx.compose.ui.unit.sp
 fun SetupScreen(viewModel: TrekViewModel, onNavigateToTracking: () -> Unit) {
     val name by viewModel.userName.collectAsState()
     val contact by viewModel.contact.collectAsState()
-    val duration by viewModel.durationMinutes.collectAsState()
+    val duration by viewModel.durationHours.collectAsState()
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     val darkBlue = Color(0xFF0B3C5D)
     val safetyGreen = Color(0xFF2ECC71)
@@ -110,6 +111,7 @@ fun SetupScreen(viewModel: TrekViewModel, onNavigateToTracking: () -> Unit) {
         Button(
             onClick = {
                 viewModel.startTrek()
+                android.widget.Toast.makeText(context, "Tracking started. You'll be alerted before time expires.", android.widget.Toast.LENGTH_LONG).show()
                 onNavigateToTracking()
             },
             modifier = Modifier.fillMaxWidth().height(56.dp),

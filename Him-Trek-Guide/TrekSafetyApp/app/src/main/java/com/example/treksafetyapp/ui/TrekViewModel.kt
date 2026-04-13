@@ -13,6 +13,12 @@ import com.example.treksafetyapp.worker.DeadManSwitchWorker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.json.JSONObject
+import java.io.OutputStreamWriter
+import java.net.HttpURLConnection
 import java.util.concurrent.TimeUnit
 
 class TrekViewModel(application: Application) : AndroidViewModel(application) {
@@ -40,7 +46,33 @@ class TrekViewModel(application: Application) : AndroidViewModel(application) {
             .putString("CONTACT", _contact.value)
             .apply()
 
-        // 1. Start foreground service
+        // 1. Sync User Identity to Backend
+        val existingUserId = sharedPrefs.getString("USER_ID", null)
+        if (existingUserId == null) {
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val url = java.net.URL("http://192.168.43.131:5000/api/users/register")
+                    val conn = url.openConnection() as HttpURLConnection
+                    conn.requestMethod = "POST"
+                    conn.setRequestProperty("Content-Type", "application/json; utf-8")
+                    conn.doOutput = true
+                    
+                    val json = JSONObject()
+                    json.put("name", _userName.value)
+                    json.put("phone", _contact.value)
+                    
+                    OutputStreamWriter(conn.outputStream).use { it.write(json.toString()) }
+                    
+                    if (conn.responseCode == 201) {
+                        val response = conn.inputStream.bufferedReader().use { it.readText() }
+                        val newUserId = JSONObject(response).getString("_id")
+                        sharedPrefs.edit().putString("USER_ID", newUserId).apply()
+                    }
+                } catch (e: Exception) { e.printStackTrace() }
+            }
+        }
+
+        // 2. Start foreground service
         val intent = Intent(app, TrekTrackingService::class.java)
         app.startService(intent)
 

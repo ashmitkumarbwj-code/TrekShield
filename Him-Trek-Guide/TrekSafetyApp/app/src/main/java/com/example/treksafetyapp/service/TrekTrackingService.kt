@@ -70,20 +70,21 @@ class TrekTrackingService : Service() {
                         conn.doOutput = true
 
                         val sharedPrefs = applicationContext.getSharedPreferences("TrekSafetyPrefs", Context.MODE_PRIVATE)
-                        val userId = sharedPrefs.getString("USER_NAME", "UnknownUser") ?: "UnknownUser"
+                        val userId = sharedPrefs.getString("USER_ID", null)
 
-                        val jsonInputString = """
-                            {
-                                "userId": "$userId",
-                                "lat": ${location.latitude},
-                                "long": ${location.longitude}
+                        if (userId != null) {
+                            val jsonInputString = """
+                                {
+                                    "userId": "$userId",
+                                    "lat": ${location.latitude},
+                                    "long": ${location.longitude}
+                                }
+                            """.trimIndent()
+
+                            conn.outputStream.use { os ->
+                                val input = jsonInputString.toByteArray(Charsets.UTF_8)
+                                os.write(input, 0, input.size)
                             }
-                        """.trimIndent()
-
-                        conn.outputStream.use { os ->
-                            val input = jsonInputString.toByteArray(Charsets.UTF_8)
-                            os.write(input, 0, input.size)
-                        }
 
                         val code = conn.responseCode
                         android.util.Log.d("TrekTrackingService", "Backend Push: HTTP $code")
