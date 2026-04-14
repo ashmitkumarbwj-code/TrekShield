@@ -43,6 +43,13 @@
             android:name=".service.TrekTrackingService"
             android:foregroundServiceType="location"
             android:exported="false" />
+
+        <receiver android:name=".utils.SmsStatusReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="SMS_SENT_ACTION"/>
+                <action android:name="SMS_DELIVERED_ACTION"/>
+            </intent-filter>
+        </receiver>
             
     </application>
 </manifest>

@@ -126,51 +126,192 @@ fun SetupScreen(viewModel: TrekViewModel, onNavigateToTracking: () -> Unit) {
             modifier = Modifier.fillMaxWidth().padding(top = 4.dp, start = 4.dp)
         )
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(16.dp))
 
-    val showPermissionDialog = remember { mutableStateOf(false) }
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.05f)),
+            border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    "Before your next trek:",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp
+                )
+                Text(
+                    "Open TrekShield and tap \"Start Trek\"",
+                    color = Color.LightGray,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Button(
+                    onClick = {
+                        if (contact.isNotBlank()) {
+                            viewModel.sendTestSms()
+                            Toast.makeText(context, "Test SMS sent successfully", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "Please enter an emergency contact first", Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, safetyGreen)
+                ) {
+                    Text("Test Emergency SMS", color = safetyGreen, fontWeight = FontWeight.Bold)
+                }
+                Text(
+                    "Standard SMS charges may apply",
+                    color = Color.LightGray,
+                    fontSize = 10.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                )
+            }
+        }
+
+        val isGpsActive by viewModel.isGpsEnabled.collectAsState()
+        val isSmsReady by viewModel.isSmsPermissionGranted.collectAsState()
+        val batteryLevel by viewModel.batteryLevel.collectAsState()
+        
+        val showBatteryWarning = remember { mutableStateOf(false) }
+
+        LaunchedEffect(Unit) {
+            viewModel.reValidateSystem()
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.05f)),
+            border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text("System Health Check", fontWeight = FontWeight.Bold, color = Color.White)
+                
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                // GPS Status
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    val gpsColor = if (isGpsActive) safetyGreen else Color.Red
+                    val gpsIcon = if (isGpsActive) "✅" else "❌"
+                    Text("$gpsIcon GPS Signal", color = gpsColor, fontSize = 14.sp)
+                    if (!isGpsActive) {
+                        Text(" - Turn on GPS", color = Color.LightGray, fontSize = 12.sp, modifier = Modifier.padding(start = 8.dp))
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // SMS Status
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    val smsColor = if (isSmsReady) safetyGreen else Color.Red
+                    val smsIcon = if (isSmsReady) "✅" else "❌"
+                    Text("$smsIcon SMS Permissions", color = smsColor, fontSize = 14.sp)
+                    if (!isSmsReady) {
+                        Text(" - Tap 'Start' to fix", color = Color.LightGray, fontSize = 12.sp, modifier = Modifier.padding(start = 8.dp))
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Battery Status
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    val batColor = if (batteryLevel >= 15) safetyGreen else Color(0xFFFFC107) // Yellow
+                    val batIcon = if (batteryLevel >= 15) "✅" else "⚠️"
+                    Text("$batIcon Battery: $batteryLevel%", color = batColor, fontSize = 14.sp)
+                }
+                   Spacer(modifier = Modifier.height(24.dp))
+
+        val showPermissionDialog = remember { mutableStateOf(false) }
 
         Button(
             onClick = {
-                val permissionStatus = ContextCompat.checkSelfPermission(context, Manifest.permission.SEND_SMS)
-                if (permissionStatus == PackageManager.PERMISSION_GRANTED) {
-                    // Skip dialog and start trek immediately
-                    viewModel.startTrek()
-                    Toast.makeText(context, "Tracking started. You'll be alerted before time expires.", Toast.LENGTH_LONG).show()
-                    onNavigateToTracking()
+                if (batteryLevel < 15) {
+                    showBatteryWarning.value = true
                 } else {
-                    showPermissionDialog.value = true
+                    if (isSmsReady) {
+                        viewModel.startTrek()
+                        onNavigateToTracking()
+                    } else {
+                        showPermissionDialog.value = true
+                    }
                 }
             },
+            enabled = isGpsActive,
             modifier = Modifier.fillMaxWidth().height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = safetyGreen)
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (isGpsActive) safetyGreen else Color.Gray
+            )
         ) {
-            Text("Start Trek", color = darkBlue, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text(
+                "Start Trek",
+                color = if (isGpsActive) darkBlue else Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
         }
-    }
 
-    if (showPermissionDialog.value) {
-        AlertDialog(
-            onDismissRequest = { showPermissionDialog.value = false },
-            title = { Text("Why TrekShield needs SMS permission", fontWeight = FontWeight.Bold) },
-            text = { Text("If you don’t check in on time, TrekShield will automatically send your live location to your emergency contact using SMS.\n\nThis helps them find you quickly in an emergency — even without internet.\n\nWe DO NOT read your personal messages or send anything without this safety trigger.") },
-            confirmButton = {
-                TextButton(onClick = {
-                    showPermissionDialog.value = false
-                    Toast.makeText(context, "Permission required for emergency SMS alerts", Toast.LENGTH_SHORT).show()
-                    permissionLauncher.launch(Manifest.permission.SEND_SMS)
-                }) {
-                    Text("Continue", color = safetyGreen, fontWeight = FontWeight.Bold)
+        // Low battery warning dialog
+        if (showBatteryWarning.value) {
+            AlertDialog(
+                onDismissRequest = { showBatteryWarning.value = false },
+                title   = { Text("⚠️ Low Battery ($batteryLevel%)") },
+                text    = { Text("TrekShield tracking may not reach its end if battery dies. Continue anyway?") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showBatteryWarning.value = false
+                        if (isSmsReady) {
+                            viewModel.startTrek()
+                            onNavigateToTracking()
+                        } else {
+                            showPermissionDialog.value = true
+                        }
+                    }) {
+                        Text("Start Anyway", color = Color.Red)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showBatteryWarning.value = false }) {
+                        Text("Cancel")
+                    }
                 }
-            },
-            dismissButton = {
-                TextButton(onClick = { showPermissionDialog.value = false }) {
-                    Text("Cancel", color = Color.Gray)
-                }
-            },
-            containerColor = darkBlue,
-            titleContentColor = Color.White,
-            textContentColor = Color.LightGray
-        )
+            )
+        }
+
+        // SMS permission explanation dialog
+        if (showPermissionDialog.value) {
+            AlertDialog(
+                onDismissRequest = { showPermissionDialog.value = false },
+                title = { Text("Why TrekShield Needs SMS", fontWeight = FontWeight.Bold) },
+                text  = {
+                    Text(
+                        "TrekShield uses SMS to alert your emergency contact if you don't check in on time " +
+                        "— even without internet.\n\nWe never read your messages or send anything without a safety trigger."
+                    )
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showPermissionDialog.value = false
+                        permissionLauncher.launch(Manifest.permission.SEND_SMS)
+                    }) {
+                        Text("Grant Permission", color = safetyGreen, fontWeight = FontWeight.Bold)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showPermissionDialog.value = false }) {
+                        Text("Cancel", color = Color.Gray)
+                    }
+                },
+                containerColor    = darkBlue,
+                titleContentColor = Color.White,
+                textContentColor  = Color.LightGray
+            )
+        }
     }
 }

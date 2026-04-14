@@ -6,7 +6,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 // PRODUCTION URL - We'll update this once deployment is confirmed
-const API_URL = "https://trekshield-backend.vercel.app/api/location/last/";
+const API_URL = "https://trekshield-backend.onrender.com/api/location/last/";
 
 let marker = null;
 const statusIndicator = document.getElementById("status-indicator");
