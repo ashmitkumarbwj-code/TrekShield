@@ -15,6 +15,11 @@ connectDB();
 app.use('/api/users', userRoutes);
 app.use('/api/location', locationRoutes);
 
+// Root Health Check
+app.get('/', (req, res) => {
+    res.status(200).send('🛡️ TrekShield API Live');
+});
+
 const PORT = process.env.PORT || 5000;
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {
